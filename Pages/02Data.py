@@ -1,119 +1,114 @@
 import streamlit as st
-import pandas as pd
+from joblib import load
 import pyodbc
-from dotenv import dotenv_values
-from dotenv import load_dotenv
-from pathlib import Path
-from streamlit_extras.switch_page_button import switch_page
+import pandas as pd
+from dotenv import dotenv_values 
 
-if st.session_state.get("authentication_status"):
-    if st.session_state["authentication_status"]:
+st.set_page_config(
+    page_title='Data',
+    page_icon='📜',
+    layout='wide'
+)
 
-        col1, col2, col3, col4, col5 = st.columns(5)
 
-        if col1.button("Home"):
-            switch_page("Home")
+# st.cache_resource(show_spinner='Connecting to database...')
 
-        if col2.button("data"):
-            switch_page("data")
+# def initialize_connection():
+#     connection = pyodbc.connect(
+#         "DRIVER = {SQL Server};SERVER="
+#         + st.secrets["SERVER"]
+#         + ";DATABASE = "
+#         + st.secrets["DATABASE"]
+#         + ";UID="
+#         + st.secrets["UID"]
+#         + ";PWD="
+#         + st.secrets["PWD"]
 
-        if col3.button("dashboard"):
-            switch_page("dashboard")
+#     )
+#     return connection
 
-        if col4.button("predict"):
-            switch_page("predict")
 
-        if col5.button("history"):
-            switch_page("history")
+# conn = initialize_connection()
 
-        # Get the directory of the current script
-        current_dir = Path(__file__).resolve().parent
+# #run a query to get data from database
+# def query_database(query):
+#     with conn.cursor() as cur:
+#         cur.execute(query)
+#         rows = cur.fetchall()
 
-        # Load environment variables from .env file in the parent directory
-        dotenv_path = current_dir.parent / '.env'
-        load_dotenv(dotenv_path)
+#         df = pd.DataFrame.from_records(data=rows, columns=[column[0] for column in cur.description])
 
-        # Load environment variables
-        environment_variables = dotenv_values(dotenv_path)
-        server = environment_variables.get("SERVER")
-        username = environment_variables.get("USERNAME")
-        password = environment_variables.get("PASSWORD")
-        database = environment_variables.get("DATABASE")
+#     return rows
 
-        # Establish connection
-        connection_string = f"DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};MARS_Connection=yes;MinProtocolVersion=TLSv1.2;"
-        connection = pyodbc.connect(connection_string)
+# query = "Select * from dbo.LP2_Telco_churn_first_3000"
+# query_database(query)
 
-        # Fetch data
-        query = "Select * from dbo.LP2_Telco_churn_first_3000"
-        df1 = pd.read_sql(query, connection)
-        df2 = pd.read_csv("Data\LP2_Telco-churn-second-2000.csv")
 
-        # Optional data cleaning (e.g., handling missing values)
 
-        # Display headers and descriptions
-        st.header("Telco Churn Data Exploration")
-        st.subheader("First: 3000 rows from database")
 
-        # Display DataFrame 1
-        st.dataframe(df1.head())
+environment_variables = dotenv_values('.env')
 
-        # Display DataFrame 2 with options
-        st.subheader("Second: 2000 rows from CSV")
-        show_full_df2 = st.checkbox("Show full DataFrame")
-        if show_full_df2:
-            st.dataframe(df2)
-        else:
-            st.dataframe(df2.head())
 
-        # Implement interactive filtering, visualizations, etc.
+# Get the values for the credentials you set in the '.env' file
+server = environment_variables.get("SERVER")
+username = environment_variables.get("USERNAME")
+password = environment_variables.get("PASSWORD")
+database = environment_variables.get("DATABASE")
 
-        from joblib import dump, load
-        # Load the cleaned data using joblib
-        loaded_cleaned_training_data = load('packages\cleaned_training_data.joblib')
-        # Display the loaded data using Streamlit
-        st.header("Loaded Cleaned Training Data:")
-        st.dataframe(loaded_cleaned_training_data)
 
-        # Separate categorical and numerical columns
-        categorical_columns = loaded_cleaned_training_data.select_dtypes(include=['object']).columns
-        numerical_columns = loaded_cleaned_training_data.select_dtypes(exclude=['object']).columns
+#connection_string = f"DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}"
+connection_string = f"DRIVER={{SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};MARS_Connection=yes;MinProtocolVersion=TLSv1.2;"
 
-        # Sidebar selection for column type
-        column_type = st.sidebar.radio("Select Column Type", ("Categorical", "Numerical"))
+# Establish a connection to the database using the provided connection string.
+connection = pyodbc.connect(connection_string)
 
-        if column_type == "Categorical":
-            # Display categorical columns
-            selected_column = st.selectbox("Select Categorical Column", categorical_columns)
-            st.write(loaded_cleaned_training_data[selected_column].value_counts())
 
-        else:
-            # Display numerical columns
-            selected_column = st.selectbox("Select Numerical Column", numerical_columns)
-            st.write(loaded_cleaned_training_data[selected_column].describe())
 
-        # Option to display the entire DataFrame
-        show_full_df = st.checkbox("Show Full DataFrame")
-        if show_full_df:
-            st.write(loaded_cleaned_training_data)
-    else:
-        st.error('Username/password is incorrect')
-else:
-    st.error('Please log in to access this page.')
+def select_all_features():
+     #load the first data
+    query = "Select * from dbo.LP2_Telco_churn_first_3000"
+    df = pd.read_sql(query, connection)
 
-st.header('Variable Description')
-def load_variable_descriptions():
-    descriptions = {}
-    with open("Data/variable_descriptions.txt", "r") as file:
-        for line_number, line in enumerate(file, start=1):
-            parts = line.strip().split(" -- ", 1)
-            if len(parts) == 2:
-                variable, description = parts
-                descriptions[variable.strip()] = description.strip()
-            else:
-                st.warning(f"Issue parsing line {line_number}: {line} - Expected format: 'Variable Name -- Description'")
-    
-    st.write(descriptions)  # Debug: Print loaded descriptions
-    return descriptions
+    return df
 
-variable_descriptions = load_variable_descriptions()
+def select_numeric():
+     #load the first data
+    query = "Select * from dbo.LP2_Telco_churn_first_3000"
+    df = pd.read_sql(query, connection)
+
+    # Filter only numeric variables
+    numeric_df = df.select_dtypes(include='number')
+
+    return numeric_df
+
+def select_categorical():
+     #load the first data
+    query = "Select * from dbo.LP2_Telco_churn_first_3000"
+    df = pd.read_sql(query, connection)
+
+    # Filter only categorical variables
+    categorical_df = df.select_dtypes(include='object')
+
+    return categorical_df
+
+if __name__ == "__main__":
+    select_all_features()
+
+# Sidebar to select option
+    option = st.sidebar.selectbox("Select data type", ["All Data", "Numeric Data", "Categorical Data"])
+
+    # Display corresponding data
+    if option == "All Data":
+        df = select_all_features()
+        st.title("All Data")
+    elif option == "Numeric Data":
+        df = select_numeric()
+        st.title("Numeric Data")
+    elif option == "Categorical Data":
+        df = select_categorical()
+        st.title("Categorical Data")
+
+    # Display DataFrame
+    st.write(df)
+   
+
