@@ -1,17 +1,19 @@
 import streamlit as st
 from PIL import Image
 from streamlit_extras.switch_page_button import switch_page
+
+st.set_page_config(
+            page_title='My Awesome App',
+            page_icon='🏠',
+            layout='wide'
+        )
 # Check authentication status
 if st.session_state.get("authentication_status"):
     if st.session_state["authentication_status"]:
         st.write(f'Welcome to the Churn App *{st.session_state["name"]}*')
         # Content of the specific page goes here
 
-        # st.set_page_config(
-        #     page_title='My Awesome App',
-        #     page_icon='🏠',
-        #     layout='wide'
-        # )
+       
 
 
         col1, col2, col3, col4, col5 = st.columns(5)

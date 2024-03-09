@@ -1,19 +1,17 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-import plotly.figure_factory as ff
 from joblib import load
 from streamlit_extras.switch_page_button import switch_page
 
 st.set_page_config(
-    page_title='My Awesome App',
-    page_icon='🏠',
+    page_title='Dashboard',
+    page_icon='📜',
     layout='wide'
 )
+
 if st.session_state.get("authentication_status"):
     if st.session_state["authentication_status"]:
-
         # Display top navigation buttons
         col1, col2, col3, col4, col5 = st.columns(5)
         if col1.button("Home"):
@@ -27,14 +25,10 @@ if st.session_state.get("authentication_status"):
         if col5.button("History"):
             switch_page("History")
 
-
         # Load the cleaned data using joblib
         loaded_cleaned_training_data = load('Packages/cleaned_training_data.joblib')
 
-        # Display the loaded data using Streamlit
-        st.title('Visualizations from cleaned data')
-        st.header("Loaded Cleaned Training Data Sample:")
-        st.dataframe(loaded_cleaned_training_data.head())
+       
 
         # EDA selection
         st.sidebar.title('Exploratory Data Analysis (EDA)')
@@ -46,7 +40,6 @@ if st.session_state.get("authentication_status"):
         selected_eda_option = st.sidebar.selectbox('Select EDA Option', eda_options)
 
         if selected_eda_option == 'Visualizations':
-
             # Separate categorical and numerical columns
             categorical_columns = loaded_cleaned_training_data.select_dtypes(include=['object']).columns
             numerical_columns = loaded_cleaned_training_data.select_dtypes(exclude=['object']).columns
@@ -58,20 +51,32 @@ if st.session_state.get("authentication_status"):
                 fig = px.histogram(loaded_cleaned_training_data, x=loaded_cleaned_training_data[numerical_column], title=f'Histogram for {numerical_column}')
                 col.plotly_chart(fig)
 
+            # Filter only numeric columns
+            numeric_data = loaded_cleaned_training_data.select_dtypes(include=['float64', 'int64'])
+
             # Plot box plots for numerical variables
-            st.header("Box Plots for Numerical Variables")
-            boxplot_cols = st.columns(len(numerical_columns))
-            for col, numerical_column in zip(boxplot_cols, numerical_columns):
-                boxplot_trace = go.Box(y=loaded_cleaned_training_data[numerical_column], name=numerical_column, marker=dict(color='rgba(150, 10, 50, 0.6)'))
-                layout = go.Layout(title=f'Box Plot of {numerical_column}', yaxis=dict(title=numerical_column), template='plotly_white')
-                boxplot_fig = go.Figure(data=[boxplot_trace], layout=layout)
-                col.plotly_chart(boxplot_fig)
+            if not numeric_data.empty:
+                st.header("Box Plots for Numerical Variables")
+                boxplot_fig = px.box(numeric_data, title='Box Plots of Numerical Variables')
+                st.plotly_chart(boxplot_fig)
+            else:
+                st.write("No numeric variables found for box plot visualization.")
+
+            # # Plot box plots for numerical variables
+            # st.header("Box Plots for Numerical Variables")
+            # boxplot_fig = px.box(loaded_cleaned_training_data, title='Box Plots of Numerical Variables')
+            # st.plotly_chart(boxplot_fig)
 
             # Plot heatmap for numerical variables
             st.header("Correlation Heatmap of Numerical Variables")
+
+            # Calculate correlation matrix
             corr = loaded_cleaned_training_data[numerical_columns].corr()
-            fig = ff.create_annotated_heatmap(z=corr.values, x=list(corr.columns), y=list(corr.index), colorscale='Viridis')
-            fig.update_layout(xaxis_title='Numerical Variables', yaxis_title='Numerical Variables')
+
+            # Plot heatmap with specified color scale
+            fig = px.imshow(corr, color_continuous_scale='RdBu_r', labels={'x': 'Numerical Variables', 'y': 'Numerical Variables'}, title='Correlation Heatmap of Numerical Variables')
+
+            # Show the plot
             st.plotly_chart(fig)
 
             # Plot pairplots for numerical variables
@@ -79,47 +84,85 @@ if st.session_state.get("authentication_status"):
             pairplot_fig = px.scatter_matrix(loaded_cleaned_training_data[numerical_columns], height=800, width=800)
             st.plotly_chart(pairplot_fig)
 
+           # Filter categorical columns from the DataFrame
+            categorical_columns = loaded_cleaned_training_data.select_dtypes(include=['object']).columns.tolist()
+
             # Plot bar plots for categorical variables
             st.title('Categorical Variable Analysis')
-            for feature in categorical_columns:
-                description = loaded_cleaned_training_data[feature].describe()
-                unique_values_counts = loaded_cleaned_training_data[feature].value_counts()
-                missing_values_count = loaded_cleaned_training_data[feature].isnull().sum()
-                missing_values_percentage = (missing_values_count / len(loaded_cleaned_training_data)) * 100
+
+            # Define the number of columns in the layout
+            num_columns = 2
+
+            # Calculate the number of rows needed
+            num_rows = (len(categorical_columns) + num_columns - 1) // num_columns
+
+            # Create a matrix-like layout for the bar plots
+            for i in range(num_rows):
+                # Create a new row
+                row = st.columns(num_columns)
+                for j in range(num_columns):
+                    # Calculate the index of the current categorical variable
+                    index = i * num_columns + j
+                    if index < len(categorical_columns):
+                        feature = categorical_columns[index]
+                        unique_values_counts = loaded_cleaned_training_data[feature].value_counts()
+                        
+                        # Create a plot for the current categorical variable
+                        with row[j]:
+                            fig = px.bar(x=unique_values_counts.index, y=unique_values_counts.values, title=f"Distribution of {feature}", labels={'x': feature, 'y': 'Count'})
+                            st.header(f"Univariate Analysis of Feature: {feature}")
+                            st.plotly_chart(fig)
+
+            # # Plot bar plots for categorical variables
+            # st.title('Categorical Variable Analysis')
+            # for feature in categorical_columns:
+            #     description = loaded_cleaned_training_data[feature].describe()
+            #     unique_values_counts = loaded_cleaned_training_data[feature].value_counts()
+            #     missing_values_count = loaded_cleaned_training_data[feature].isnull().sum()
+            #     missing_values_percentage = (missing_values_count / len(loaded_cleaned_training_data)) * 100
                 
-                fig = go.Figure(go.Bar(x=unique_values_counts.index, y=unique_values_counts.values))
-                fig.update_layout(title=f"Distribution of {feature}", xaxis_title=feature, yaxis_title="Count")
-                
-                st.header(f"Univariate Analysis of Feature: {feature}")
-                st.write(description)
-                st.plotly_chart(fig)
+            #     fig = px.bar(x=unique_values_counts.index, y=unique_values_counts.values, title=f"Distribution of {feature}", labels={'x': feature, 'y': 'Count'})
+            #     st.header(f"Univariate Analysis of Feature: {feature}")
+            #     st.write(description)
+            #     st.plotly_chart(fig)
+        
+
 
         elif selected_eda_option == 'KPIs':
+
+            # Define custom colors
+            custom_colors = {'Male': 'cyan', 'Female': 'green'}
             # Calculate average tenure per customer segment
-            avg_tenure_per_segment = loaded_cleaned_training_data.groupby('Churn')['tenure'].mean()
+            avg_tenure_per_segment = loaded_cleaned_training_data.groupby(['gender'])['tenure'].mean().reset_index()
 
             # Calculate average monthly charge per customer segment
-            avg_monthly_charge_per_segment = loaded_cleaned_training_data.groupby('Churn')['MonthlyCharges'].mean()
+            avg_monthly_charge_per_segment = loaded_cleaned_training_data.groupby(['gender'])['MonthlyCharges'].mean().reset_index()
 
-            # Convert 'Yes' and 'No' to 1 and 0 respectively
-            loaded_cleaned_training_data['Churn'] = loaded_cleaned_training_data['Churn'].map({'Yes': 1, 'No': 0})
-
-            # Calculate churn rate
-            churn_rate = loaded_cleaned_training_data['Churn'].mean()
-            # Display churn rate with bigger font size
-
-
+            # Visualizations for KPIs
             st.header('Key Performance Indicators (KPIs)')
-            st.subheader('Average Tenure Per Customer Segment')
-            st.write(avg_tenure_per_segment)
 
-            st.subheader('Average Monthly Charge Per Customer Segment')
-            st.write(avg_monthly_charge_per_segment)
+            # Average Tenure Per Gender (Bar Chart)
+            st.subheader('Average Tenure Per Gender (Bar Chart)')
+            fig_avg_tenure_bar = px.bar(avg_tenure_per_segment, x='gender', y='tenure', color='gender', labels={'gender': 'Gender', 'tenure': 'Average Tenure'}, title='Average Tenure Per Gender', color_discrete_map=custom_colors)
+            st.plotly_chart(fig_avg_tenure_bar)
 
-            st.header('Churn Rate')
-            st.write(f"<h3>{churn_rate}</h3>", unsafe_allow_html=True)
-            st.write("A churn rate of 0.26497421658072196 means that approximately 26.5 percent of customers are churning.")
+            # Average Tenure Per Gender (Pie Chart)
+            st.subheader('Average Tenure Per Gender (Pie Chart)')
+            fig_avg_tenure_pie = px.pie(avg_tenure_per_segment, values='tenure', names='gender', labels={'tenure': 'Average Tenure'}, color='gender', color_discrete_map=custom_colors)
+            st.plotly_chart(fig_avg_tenure_pie)
+
+            # Average Monthly Charge Per Gender (Bar Chart)
+            st.subheader('Average Monthly Charge Per Gender (Bar Chart)')
+            fig_avg_monthly_charge_bar = px.bar(avg_monthly_charge_per_segment, x='gender', y='MonthlyCharges', color='gender', labels={'gender': 'Gender', 'MonthlyCharges': 'Average Monthly Charge'}, title='Average Monthly Charge Per Gender', color_discrete_map=custom_colors)
+            st.plotly_chart(fig_avg_monthly_charge_bar)
+
+            # Average Monthly Charge Per Gender (Pie Chart)
+            st.subheader('Average Monthly Charge Per Gender (Pie Chart)')
+            fig_avg_monthly_charge_pie = px.pie(avg_monthly_charge_per_segment, values='MonthlyCharges', names='gender', labels={'MonthlyCharges': 'Average Monthly Charge'}, color='gender', color_discrete_map=custom_colors)
+            st.plotly_chart(fig_avg_monthly_charge_pie)
+
+            
     else:
         st.error('Username/password is incorrect')
 else:
-    st.error('Please log in to access this page.')           
+    st.error('Please log in to access this page.')

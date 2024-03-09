@@ -30,15 +30,11 @@ def render_sidebar():
         if st.sidebar.button("Home"):
             switch_page("Home")
         # Add logout button to the sidebar
-        if st.session_state.logout_button:
-            if st.sidebar.button("Logout"):
-                authenticator.logout()
+        if st.sidebar.button("Logout", key="logout_button"):
+            authenticator.logout(button_name="Logout from App")
+                
     else:
         st.sidebar.warning("Please log in to access the application.")
-
-# Initialize logout button state
-if "logout_button" not in st.session_state:
-    st.session_state.logout_button = True
 
 # Render the sidebar
 render_sidebar()
@@ -46,9 +42,11 @@ render_sidebar()
 # Render content based on authentication status
 if st.session_state.get("authentication_status"):
     st.write(f'Welcome to the Churn App *{st.session_state["name"]}*')
-    if st.button("Go to Home"):
-        switch_page("Home")
+    
 elif st.session_state.get("authentication_status") is False:
     st.error('Username/password is incorrect')
 elif st.session_state.get("authentication_status") is None:
     st.warning('Please enter your username and password')
+    st.write("Test login credentials")
+    st.write("Username: rbriggs")
+    st.write("Password: def")

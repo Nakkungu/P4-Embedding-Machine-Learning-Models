@@ -1,0 +1,9 @@
+TotalCharges,MonthlyCharges,tenure,gender,SeniorCitizen,Partner,Dependents,PhoneService,MultipleLines,InternetService,OnlineSecurity,OnlineBackup,DeviceProtection,TechSupport,StreamingTV,StreamingMovies,Contract,PaperlessBilling,PaymentMethod,Prediction Time,prediction,probability_yes,probability_no
+2500.0,35.0,0.5,Female,Yes,Yes,Yes,Yes,No,DSL,No,No,No,No,No,No,Month-to-month,Yes,Electronic check,2024-03-09,No,0.0,1.0
+3500.0,50.0,0.5,Male,Yes,Yes,Yes,Yes,No,DSL,Yes,Yes,No,No,No,Yes,Month-to-month,Yes,Mailed check,2024-03-09,No,0.5,0.5
+3600.0,50.0,1.0,Male,Yes,Yes,Yes,Yes,No phone service,Fiber optic,No,Yes,Yes,No,No,No,Month-to-month,Yes,Bank transfer (automatic),2024-03-09,No,0.3799531196316911,0.6200468803683089
+5000.0,100.0,1.0,Female,Yes,Yes,Yes,Yes,No,DSL,No,Yes,No,No,No,No,Month-to-month,Yes,Electronic check,2024-03-09,No,0.0,1.0
+5000.0,100.0,1.0,Female,Yes,Yes,Yes,Yes,No,Fiber optic,No,Yes,Yes,No,No,No,One year,Yes,Electronic check,2024-03-09,No,0.0,1.0
+3500.0,55.0,0.7,Male,No,No,Yes,Yes,No,Fiber optic,No,Yes,Yes,No,No,No,Month-to-month,Yes,Mailed check,2024-03-09,Yes,1.0,0.0
+3500.0,55.0,0.7,Male,No,No,Yes,Yes,Yes,No,No internet service,No internet service,No internet service,No internet service,No internet service,No internet service,Month-to-month,Yes,Mailed check,2024-03-09,No,0.0,1.0
+3500.0,55.0,0.7,Male,No,No,Yes,Yes,Yes,DSL,Yes,Yes,No,Yes,No,No,One year,Yes,Bank transfer (automatic),2024-03-09,No,0.2476455324616185,0.7523544675383814
