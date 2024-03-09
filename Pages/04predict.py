@@ -34,6 +34,8 @@ from sklearn.naive_bayes import GaussianNB
 from imblearn.pipeline import Pipeline as imbpipeline
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import confusion_matrix
+import os
+import datetime
 
 
 
@@ -44,9 +46,7 @@ st.set_page_config(
     layout='wide'
 )
 
-if 'prediction' not in st.session_state:
-    st.session_state['prediction'] = None
-
+st.cache_resource
 loaded_cleaned_training_data = load('Packages/cleaned_training_data.joblib')
 loaded_cleaned_training_data['Churn'] = loaded_cleaned_training_data['Churn'].fillna('No')
 
@@ -222,6 +222,9 @@ def select_model():
     encoder = label_encoder
     return pipeline, encoder
 
+# if not os.path.exists('./ddata/history.csv'):
+#         os.mkdir('./ddata')
+
 
 def make_prediction(pipeline, encoder):
     
@@ -275,7 +278,7 @@ def make_prediction(pipeline, encoder):
     }
     df = pd.DataFrame(data)
 
-    
+        
     # Make prediction
     pred = pipeline.predict(df)
     prediction = int(pred[0])
@@ -284,6 +287,17 @@ def make_prediction(pipeline, encoder):
     #get probabilities
     probability = pipeline.predict_proba(df)
 
+
+    df['Prediction Time'] = datetime.date.today()
+    df['prediction'] = prediction
+     # Extract probabilities for churn (Yes) and no churn (No)
+    probability_of_yes = probability.tolist()[0][1]  # Probability of churn
+    probability_of_no = probability.tolist()[0][0]   # Probability of no churn
+
+    # Add probability columns to DataFrame
+    df['probability_yes'] = probability_of_yes
+    df['probability_no'] = probability_of_no
+    df.to_csv('./ddata/history.csv', mode='a', header=not os.path.exists("./ddata/history.csv"), index=False)
 
     st.session_state['prediction'] = prediction
     st.session_state['probability'] = probability
@@ -332,11 +346,15 @@ def display_form():
 
     
         st.form_submit_button('Submit', on_click=make_prediction, kwargs=dict(pipeline=pipeline, encoder= encoder))
-
-
+        # Store prediction results in a DataFrame
+    
 
 if __name__ == "__main__":
     st.title('Prediction')
+
+    if 'prediction' not in st.session_state:
+        st.session_state['prediction'] = None
+        st.session_state['probability'] = None
      
     display_form()
     prediction = st.session_state['prediction']

@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_extras.switch_page_button import switch_page
+import pandas as pd
 
 st.set_page_config(
     page_title='History',
@@ -25,6 +26,18 @@ if st.session_state.get("authentication_status"):
 
         if col5.button("history"):
             switch_page("history")
+
+        def show_historic_predictions():
+            csv_path = "./ddata/history.csv"
+            df = pd.read_csv(csv_path)
+
+            return df
+
+        if __name__ == "__main__":
+          df = show_historic_predictions()  
+          st.dataframe(df)
+        
+                
 
     else:
         st.error('Username/password is incorrect')
