@@ -43,9 +43,9 @@ A virtual environment isolates project dependencies from your system-wide Python
 
 Bash
 
-('python -m venv venv  # Replace 'venv' with your desired environment name
+'''python -m venv venv  # Replace 'venv' with your desired environment name
 source venv/bin/activate  # Activate the virtual environment (Linux/macOS)
-venv\Scripts\activate.bat  # Activate on Windows')
+venv\Scripts\activate.bat  # Activate on Windows'''
 
 Use code with caution.
 Now, any packages you install will be placed within this virtual environment.
