@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+from streamlit_extras.switch_page_button import switch_page
 
 # Generate hashed passwords (replace with your actual password hashing logic)
 hashed_passwords = stauth.Hasher(['your_password1', 'your_password2']).generate()
@@ -26,6 +27,8 @@ if authentication_status:
     authenticator.logout('Logout', 'main')
     st.write(f'Welcome *{name}*')
     st.title('Enjoy Exploring the App')
+    switch_page("Home")
+
 elif authentication_status == False or authentication_status is None:
     st.write('Use this login')
     st.write('Username: rbriggs')

@@ -3,6 +3,7 @@ from joblib import load
 import pyodbc
 import pandas as pd
 from dotenv import dotenv_values 
+from streamlit_extras.switch_page_button import switch_page
 
 st.set_page_config(
     page_title='Data',
@@ -14,6 +15,25 @@ st.set_page_config(
 if st.session_state.get("authentication_status"):
     if st.session_state["authentication_status"]:
         st.write(f'Welcome to the Churn App *{st.session_state["name"]}*')
+
+        # Navigation buttons
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        if col1.button("Home"):
+            switch_page("Home")
+
+        if col2.button("Data"):
+            switch_page("data")
+
+        if col3.button("Dashboard"):
+            switch_page("dashboard")
+
+        if col4.button("Predict"):
+            switch_page("predict")
+
+        if col5.button("History"):
+            switch_page("history")
+
 
 
         environment_variables = dotenv_values('.env')
