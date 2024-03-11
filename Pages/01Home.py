@@ -59,8 +59,8 @@ if st.session_state.get("authentication_status"):
         with col2:
             st.subheader("Get Help:")
             st.write("If you need assistance, check out these resources:")
-            st.markdown("[User Guide](https://example.com/user-guide): Detailed instructions on using the app.")
-            st.markdown("[FAQs](https://example.com/faqs): Answers to common questions.")
+            st.markdown("[Reference](https://docs.streamlit.io/get-started/tutorials/create-an-app): Detailed instructions on how the app was created.")
+            st.markdown("[FAQs](https://discuss.streamlit.io/c/faqs/29): Answers to common questions.")
 
         # Column 3: Source Code and Social Links
         with col3:
