@@ -7,7 +7,7 @@ credentials:
     rbriggs:
       email: rbriggs@gmail.com
       name: Rebecca Briggs
-      password: def # To be replaced with hashed password
+      password: rem # To be replaced with hashed password
 cookie:
   expiry_days: 30
   key: some_signature_key # Must be string
