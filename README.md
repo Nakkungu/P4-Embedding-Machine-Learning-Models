@@ -27,7 +27,7 @@ The provided folder structure helps organize your Streamlit app effectively. Her
 
 ### Application Code:
 
-- **login.py** (Optional): This file implements a login functionality if your app requires user authentication.
+- **main.py** (Optional): This file implements a login functionality if your app requires user authentication.
 
 ### Pages:
 
@@ -72,7 +72,7 @@ A virtual environment isolates project dependencies from your system-wide Python
 
 '''python -m venv venv # Replace 'venv' with your desired environment name
 source venv/bin/activate # Activate the virtual environment (Linux/macOS)
-venv\Scripts\activate.bat # Activate on Windows
+venv\Scripts\activate.bat # Activate on Windows'''
 
 *Use code with caution.*
 
