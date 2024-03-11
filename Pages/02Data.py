@@ -11,40 +11,6 @@ st.set_page_config(
 )
 
 
-# st.cache_resource(show_spinner='Connecting to database...')
-
-# def initialize_connection():
-#     connection = pyodbc.connect(
-#         "DRIVER = {SQL Server};SERVER="
-#         + st.secrets["SERVER"]
-#         + ";DATABASE = "
-#         + st.secrets["DATABASE"]
-#         + ";UID="
-#         + st.secrets["UID"]
-#         + ";PWD="
-#         + st.secrets["PWD"]
-
-#     )
-#     return connection
-
-
-# conn = initialize_connection()
-
-# #run a query to get data from database
-# def query_database(query):
-#     with conn.cursor() as cur:
-#         cur.execute(query)
-#         rows = cur.fetchall()
-
-#         df = pd.DataFrame.from_records(data=rows, columns=[column[0] for column in cur.description])
-
-#     return rows
-
-# query = "Select * from dbo.LP2_Telco_churn_first_3000"
-# query_database(query)
-
-
-
 
 environment_variables = dotenv_values('.env')
 
@@ -107,8 +73,33 @@ if __name__ == "__main__":
     elif option == "Categorical Data":
         df = select_categorical()
         st.title("Categorical Data")
-
-    # Display DataFrame
+        # Display DataFrame
     st.write(df)
+# Description of the columns
+with st.expander("Column Descriptions", expanded=True):
+    st.info("""
+    - **Gender**: Whether the customer is a male or a female
+    - **SeniorCitizen**: Whether a customer is a senior citizen or not
+    - **Partner**: Whether the customer has a partner or not (Yes, No)
+    - **Dependents**: Whether the customer has dependents or not (Yes, No)
+    - **Tenure**: Number of months the customer has stayed with the company
+    - **PhoneService**: Whether the customer has a phone service or not (Yes, No)
+    - **MultipleLines**: Whether the customer has multiple lines or not
+    - **InternetService**: Customer's internet service provider (DSL, Fiber Optic, No)
+    - **OnlineSecurity**: Whether the customer has online security or not (Yes, No, No Internet)
+    - **OnlineBackup**: Whether the customer has online backup or not (Yes, No, No Internet)
+    - **DeviceProtection**: Whether the customer has device protection or not (Yes, No, No internet service)
+    - **TechSupport**: Whether the customer has tech support or not (Yes, No, No internet)
+    - **StreamingTV**: Whether the customer has streaming TV or not (Yes, No, No internet service)
+    - **StreamingMovies**: Whether the customer has streaming movies or not (Yes, No, No Internet service)
+    - **Contract**: The contract term of the customer (Month-to-Month, One year, Two year)
+    - **PaperlessBilling**: Whether the customer has paperless billing or not (Yes, No)
+    - **PaymentMethod**: The customer's payment method (Electronic check, mailed check, Bank transfer(automatic), Credit card(automatic))
+    - **MonthlyCharges**: The amount charged to the customer monthly
+    - **TotalCharges**: The total amount charged to the customer
+    - **Churn**: Whether the customer churned or not (Yes or No)
+    """)
+
+
    
 

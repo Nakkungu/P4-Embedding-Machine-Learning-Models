@@ -7,7 +7,7 @@ Project Structure Breakdown:
 
 The provided folder structure helps organize your Streamlit app effectively. Here's what each folder does:
 
-Optional Folders:
+Folders:
 
 .data: Stores data files your app uses, such as CSV or Excel files.
 .env: Contains environment variables for sensitive information like database credentials. Important: Create this file yourself and exclude it from version control (like Git) to avoid exposing sensitive data.
