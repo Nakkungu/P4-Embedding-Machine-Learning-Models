@@ -27,8 +27,7 @@ if authentication_status:
     authenticator.logout('Logout', 'main')
     st.write(f'Welcome *{name}*')
     st.title('Enjoy Exploring the App')
-    if st.button("Home"):
-        switch_page("Home")
+    
 
 elif authentication_status == False or authentication_status is None:
     st.write('Use this login')
