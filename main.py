@@ -5,6 +5,13 @@ from yaml.loader import SafeLoader
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
+
+st.set_page_config(
+    page_title='Login',
+    page_icon='🪵',
+    layout='wide'
+)
+
 # Generate hashed passwords (replace with your actual password hashing logic)
 hashed_passwords = stauth.Hasher(['your_password1', 'your_password2']).generate()
 
